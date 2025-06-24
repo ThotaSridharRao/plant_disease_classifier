@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Classifier</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom font declarations (Tailwind will use these if available) */
+        body {
+            font-family: 'DM Sans', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Custom pulse animation for splash screen */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-delay-0 { animation: pulse 1.5s infinite; }
+        .animate-pulse-delay-200 { animation: pulse 1.5s infinite 0.2s; }
+        .animate-pulse-delay-400 { animation: pulse 1.5s infinite 0.4s; }
+
+        /* Fade out animation for splash screen */
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        .animate-fade-out {
+            animation: fadeOut 3s forwards;
+        }
+
+        /* Fade in and slide up animation for Hero section elements */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+            opacity: 0; /* Start hidden */
+        }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        /* Custom spinner for loading */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4CAF50; /* Accent color */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900 flex flex-col items-center p-4 sm:p-6 md:p-8">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 transition-opacity duration-1000 opacity-100 animate-fade-out z-50">
+        <h1 class="text-4xl md:text-6xl font-space-grotesk text-green-700 dark:text-green-400 mb-6">
+            Disease Classifier
+        </h1>
+        <div class="flex space-x-2">
+            <div class="w-4 h-4 bg-green-500 rounded-full animate-pulse-delay-0"></div>
+            <div class="w-4 h-4 bg-blue-500 rounded-full animate-pulse-delay-200"></div>
+            <div class="w-4 h-4 bg-green-500 rounded-full animate-pulse-delay-400"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="text-center py-16 md:py-24 bg-gradient-to-br from-green-100 to-blue-100 w-full rounded-xl shadow-md mb-12">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-space-grotesk text-green-800 mb-6 animate-fade-in-up">
+            Diagnose smarter, not harder.
+        </h1>
+        <p class="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-8 animate-fade-in-up delay-200">
+            Leverage AI to quickly identify plant diseases and get actionable insights.
+        </p>
+        <button id="try-classifier-button" class="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white rounded-full shadow-md bg-gradient-to-r from-green-500 to-blue-500 hover:from-blue-500 hover:to-green-500 hover:shadow-lg transition-all duration-300 animate-fade-in-up delay-400">
+            Try the Classifier
+        </button>
+    </section>
+
+    <!-- Features Section -->
+    <section class="w-full max-w-6xl mb-16 px-4">
+        <h2 class="text-3xl md:text-4xl font-space-grotesk text-center text-gray-800 mb-10">
+            Key Features
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
+                <h3 class="text-xl font-space-grotesk text-green-700 mb-4">
+                    Fast Predictions
+                </h3>
+                <p class="text-gray-700">
+                    Get instant results on your plant's health with our optimized AI model.
+                </p>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
+                <h3 class="text-xl font-space-grotesk text-blue-700 mb-4">
+                    Trained on Real Plant Data
+                </h3>
+                <p class="text-gray-700">
+                    Our model is built on a diverse dataset of real plant images for accuracy.
+                </p>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
+                <h3 class="text-xl font-space-grotesk text-green-700 mb-4">
+                    Secure & Anonymous Uploads
+                </h3>
+                <p class="text-gray-700">
+                    Your data is handled with care and privacy is our top priority.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Preview Section -->
+    <section id="upload-section" class="w-full max-w-4xl bg-white rounded-xl shadow-xl p-6 sm:p-8 md:p-10 mb-16">
+        <h2 class="text-3xl md:text-4xl font-space-grotesk text-center text-gray-800 mb-8">
+            Upload Plant Image
+        </h2>
+        <div id="drop-area"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 hover:border-green-500 hover:bg-gray-50 flex flex-col items-center justify-center min-h-[200px]">
+            <input type="file" id="file-input" accept="image/*" class="hidden">
+            <img id="image-preview" src="#" alt="Preview" class="max-w-full max-h-64 object-contain rounded-md shadow-md hidden">
+            <p id="drop-text" class="text-gray-600 text-lg">Drag & drop an image here, or click to select a file</p>
+        </div>
+        <div id="api-error" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-center hidden">
+            <p></p>
+        </div>
+        <div class="mt-6 flex justify-center">
+            <button id="predict-button" class="inline-flex items-center justify-center px-10 py-3 text-lg font-bold text-white rounded-full shadow-md bg-gradient-to-r from-green-600 to-blue-600 hover:from-blue-600 hover:to-green-600 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                <span id="predict-button-text">Predict Disease</span>
+                <div id="predict-spinner" class="spinner ml-2 hidden"></div>
+            </button>
+        </div>
+    </section>
+
+    <!-- Prediction Output Section -->
+    <section class="w-full max-w-4xl bg-white rounded-xl shadow-xl p-6 sm:p-8 md:p-10">
+        <h2 class="text-3xl md:text-4xl font-space-grotesk text-center text-gray-800 mb-8">
+            Prediction Result
+        </h2>
+        <div id="prediction-loading-skeleton" class="flex flex-col items-center justify-center p-6 hidden">
+            <div class="spinner w-12 h-12 mb-4"></div>
+            <p class="text-xl text-gray-700 mb-4">Analyzing your image...</p>
+            <div class="h-6 bg-gray-200 rounded w-3/5 mb-2"></div>
+            <div class="h-5 bg-gray-200 rounded w-4/5"></div>
+            <div class="h-24 bg-gray-200 rounded-md w-full mt-4"></div>
+        </div>
+        <div id="prediction-result-card" class="rounded-xl shadow-md p-6 border-l-4 border-green-500 hidden">
+            <h3 class="text-2xl font-space-grotesk text-green-800 mb-3">
+                Disease Detected: <span id="disease-label"></span>
+            </h3>
+            <p class="text-xl text-gray-700 mb-4">
+                Confidence: <span id="confidence-score"></span>%
+            </p>
+            <p class="text-gray-600">
+                <strong class="text-blue-700">Suggested Action:</strong> <span id="suggested-action"></span>
+            </p>
+        </div>
+        <div id="prediction-placeholder" class="text-center p-6 text-gray-600">
+            <p>Upload an image and click "Predict Disease" to see results.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-6xl text-center py-8 mt-16 border-t border-gray-200 text-gray-600">
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4">
+            <a href="#" class="hover:text-green-700 transition-colors duration-200">About</a>
+            <a href="https://github.com/ThotaSridharRao/PDC_backend" target="_blank" rel="noopener noreferrer" class="hover:text-green-700 transition-colors duration-200">GitHub</a>
+            <a href="#" class="hover:text-green-700 transition-colors duration-200">Contact</a>
+        </div>
+        <p>&copy; <span id="current-year"></span> Disease Classifier. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const splashScreen = document.getElementById('splash-screen');
+        const tryClassifierButton = document.getElementById('try-classifier-button');
+        const uploadSection = document.getElementById('upload-section');
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const imagePreview = document.getElementById('image-preview');
+        const dropText = document.getElementById('drop-text');
+        const predictButton = document.getElementById('predict-button');
+        const predictButtonText = document.getElementById('predict-button-text');
+        const predictSpinner = document.getElementById('predict-spinner');
+        const apiErrorDiv = document.getElementById('api-error');
+        const apiErrorText = apiErrorDiv.querySelector('p');
+        const predictionLoadingSkeleton = document.getElementById('prediction-loading-skeleton');
+        const predictionResultCard = document.getElementById('prediction-result-card');
+        const predictionPlaceholder = document.getElementById('prediction-placeholder');
+        const diseaseLabel = document.getElementById('disease-label');
+        const confidenceScore = document.getElementById('confidence-score');
+        const suggestedAction = document.getElementById('suggested-action');
+        const currentYear = document.getElementById('current-year');
+
+        // State variables
+        let imageFile = null;
+        const BACKEND_URL = 'https://pdc-backend-ix20.onrender.com/predict'; // Your Render backend URL
+
+        // --- Initial Setup and Event Listeners ---
+
+        // Set current year in footer
+        currentYear.textContent = new Date().getFullYear();
+
+        // Show splash screen for 3 seconds
+        setTimeout(() => {
+            splashScreen.classList.remove('opacity-100');
+            splashScreen.classList.add('opacity-0');
+            // Remove from DOM after transition to ensure no clicks on hidden element
+            setTimeout(() => {
+                splashScreen.remove();
+            }, 1000); // Matches transition-opacity duration
+        }, 3000);
+
+        // Smooth scroll to upload section
+        tryClassifierButton.addEventListener('click', () => {
+            uploadSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Handle file input click
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Handle file selection
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            handleImageFile(file);
+        });
+
+        // Drag and Drop handlers
+        dropArea.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropArea.classList.add('border-green-500', 'bg-gray-50');
+        });
+
+        dropArea.addEventListener('dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropArea.classList.remove('border-green-500', 'bg-gray-50');
+        });
+
+        dropArea.addEventListener('drop', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropArea.classList.remove('border-green-500', 'bg-gray-50');
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleImageFile(file);
+            } else {
+                showApiError("Please drop a valid image file (e.g., JPEG, PNG).");
+            }
+        });
+
+        // Predict button click handler
+        predictButton.addEventListener('click', handlePredict);
+
+        // --- Functions ---
+
+        // Handles displaying the selected image and updating state
+        function handleImageFile(file) {
+            if (file) {
+                imageFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    dropText.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+                predictButton.disabled = false; // Enable predict button
+                hideApiError(); // Clear any previous errors
+                hidePredictionResults(); // Clear previous prediction
+            } else {
+                imageFile = null;
+                imagePreview.classList.add('hidden');
+                dropText.classList.remove('hidden');
+                predictButton.disabled = true; // Disable predict button
+            }
+        }
+
+        // Shows an API error message
+        function showApiError(message) {
+            apiErrorText.textContent = message;
+            apiErrorDiv.classList.remove('hidden');
+        }
+
+        // Hides the API error message
+        function hideApiError() {
+            apiErrorDiv.classList.add('hidden');
+            apiErrorText.textContent = '';
+        }
+
+        // Hides all prediction related UI elements
+        function hidePredictionResults() {
+            predictionLoadingSkeleton.classList.add('hidden');
+            predictionResultCard.classList.add('hidden');
+            predictionPlaceholder.classList.remove('hidden');
+        }
+
+        // Displays loading state for prediction
+        function showLoadingState() {
+            predictionPlaceholder.classList.add('hidden');
+            predictionResultCard.classList.add('hidden');
+            predictionLoadingSkeleton.classList.remove('hidden');
+            predictButton.disabled = true;
+            predictButtonText.textContent = 'Predicting...';
+            predictSpinner.classList.remove('hidden');
+        }
+
+        // Hides loading state and resets predict button
+        function hideLoadingState() {
+            predictButton.disabled = false;
+            predictButtonText.textContent = 'Predict Disease';
+            predictSpinner.classList.add('hidden');
+        }
+
+        // Handles sending image to backend for prediction
+        async function handlePredict() {
+            if (!imageFile) {
+                showApiError("Please upload an image first.");
+                return;
+            }
+
+            showLoadingState();
+            hideApiError();
+
+            try {
+                const formData = new FormData();
+                formData.append('image', imageFile); // 'image' must match the backend's expected field name
+
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({})); // Try to parse JSON, fall back to empty object
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayPredictionResult(data.prediction);
+
+            } catch (error) {
+                console.error("Prediction error:", error);
+                showApiError(`Failed to get prediction: ${error.message}. Please try again.`);
+                predictionLoadingSkeleton.classList.add('hidden'); // Hide skeleton on error
+                predictionPlaceholder.classList.remove('hidden'); // Show placeholder on error
+            } finally {
+                hideLoadingState();
+            }
+        }
+
+        // Displays the prediction results in the UI
+        function displayPredictionResult(result) {
+            predictionLoadingSkeleton.classList.add('hidden');
+            predictionPlaceholder.classList.add('hidden');
+            predictionResultCard.classList.remove('hidden');
+
+            // Format label: Replace double underscores with space, then single underscores with space
+            const formattedLabel = result.label.replace(/__/g, ' ').replace(/_/g, ' ');
+
+            diseaseLabel.textContent = formattedLabel;
+            confidenceScore.textContent = (result.confidence * 100).toFixed(2);
+            suggestedAction.textContent = "Consult a plant pathology expert for tailored advice. Consider applying appropriate fungicides or bactericides as per specific disease guidelines. Ensure good air circulation and proper watering techniques.";
+        }
+
+    </script>
+</body>
+</html>
